@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.8)
 project(nav2_mppi_controller)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # Enable C++20 for Apple Clang; avoids using unsupported -fconcepts flag
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)  # Use -std=c++20, not -std=gnu++20
+endif()
+
 add_definitions(-DXTENSOR_ENABLE_XSIMD)
 add_definitions(-DXTENSOR_USE_XSIMD)
 
