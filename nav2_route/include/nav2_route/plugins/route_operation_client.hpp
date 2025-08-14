@@ -167,7 +167,7 @@ protected:
           throw nav2_core::OperationFailed(
                   "Route operation service (" + getName() + ") failed to lock node.");
         }
-        auto client = node->create_client<SrvT>(
+        auto client = node->template create_client<SrvT>(
           srv_name, rclcpp::SystemDefaultsQoS().get_rmw_qos_profile(), callback_group_);
         response = callService(client, req);
       }
