@@ -1,12 +1,5 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8)
 project(nav2_mppi_controller)
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    # Enable C++20 for Apple Clang; avoids using unsupported -fconcepts flag
-    set(CMAKE_CXX_STANDARD 20)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    set(CMAKE_CXX_EXTENSIONS OFF)  # Use -std=c++20, not -std=gnu++20
-endif()
 
 add_definitions(-DXTENSOR_ENABLE_XSIMD)
 add_definitions(-DXTENSOR_USE_XSIMD)
@@ -109,6 +102,7 @@ foreach(lib IN LISTS libraries)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       target_compile_options(${lib} PUBLIC -fconcepts)
   endif()
+  target_compile_features(${lib} PUBLIC cxx_std_20)
   target_include_directories(${lib} PUBLIC ${xsimd_INCLUDE_DIRS})  #  ${OpenMP_INCLUDE_DIRS}
   target_link_libraries(${lib} xtensor xtensor::optimize xtensor::use_xsimd)
   ament_target_dependencies(${lib} ${dependencies_pkgs})
