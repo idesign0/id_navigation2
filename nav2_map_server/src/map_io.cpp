@@ -44,7 +44,10 @@
 #include <stdexcept>
 #include <cstdlib>
 
-#include "Magick++.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-dynamic-exception-spec"
+#include <Magick++.h>
+#pragma clang diagnostic pop
 #include "nav2_util/geometry_utils.hpp"
 
 #include "yaml-cpp/yaml.h"
