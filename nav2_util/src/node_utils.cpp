@@ -19,6 +19,11 @@
 #include <algorithm>
 #include <cctype>
 
+#ifdef __APPLE__
+  #include <mach/mach.h>
+  #include <mach/thread_policy.h>
+#endif
+
 using std::chrono::high_resolution_clock;
 using std::to_string;
 using std::string;
@@ -92,15 +97,35 @@ rclcpp::Node::SharedPtr generate_internal_node(const std::string & prefix)
 
 void setSoftRealTimePriority()
 {
-  sched_param sch;
-  sch.sched_priority = 49;
-  if (sched_setscheduler(0, SCHED_FIFO, &sch) == -1) {
-    std::string errmsg(
-      "Cannot set as real-time thread. Users must set: <username> hard rtprio 99 and "
-      "<username> soft rtprio 99 in /etc/security/limits.conf to enable "
-      "realtime prioritization! Error: ");
-    throw std::runtime_error(errmsg + std::strerror(errno));
-  }
+#ifdef __APPLE__
+    thread_time_constraint_policy_data_t policy;
+    policy.period      = 0;
+    policy.computation = 5 * 1000 * 1000;  // 5 ms
+    policy.constraint  = 10 * 1000 * 1000; // 10 ms
+    policy.preemptible = TRUE;
+
+    kern_return_t kr = thread_policy_set(
+        mach_thread_self(),
+        THREAD_TIME_CONSTRAINT_POLICY,
+        (thread_policy_t)&policy,
+        THREAD_TIME_CONSTRAINT_POLICY_COUNT
+    );
+
+    if (kr != KERN_SUCCESS) {
+        throw std::runtime_error(
+            "Failed to set soft real-time priority on macOS");
+    }
+#else
+    sched_param sch;
+    sch.sched_priority = 49;
+    if (sched_setscheduler(0, SCHED_FIFO, &sch) == -1) {
+        std::string errmsg(
+            "Cannot set as real-time thread. Users must set: <username> hard rtprio 99 and "
+            "<username> soft rtprio 99 in /etc/security/limits.conf to enable "
+            "realtime prioritization! Error: ");
+        throw std::runtime_error(errmsg + std::strerror(errno));
+    }
+#endif
 }
 
 }  // namespace nav2_util
