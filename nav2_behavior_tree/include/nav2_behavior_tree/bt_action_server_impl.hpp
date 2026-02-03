@@ -278,11 +278,11 @@ bool BtActionServer<ActionT>::loadBehaviorTree(const std::string & bt_xml_filena
     tree_ = bt_->createTreeFromFile(filename, blackboard_);
     for (auto & subtree : tree_.subtrees) {
       auto & blackboard = subtree->blackboard;
-      blackboard->set("node", client_node_);
-      blackboard->set<std::chrono::milliseconds>("server_timeout", default_server_timeout_);
-      blackboard->set<std::chrono::milliseconds>("cancel_timeout", default_cancel_timeout_);
-      blackboard->set<std::chrono::milliseconds>("bt_loop_duration", bt_loop_duration_);
-      blackboard->set<std::chrono::milliseconds>(
+      blackboard->template set("node", client_node_);
+      blackboard->template set<std::chrono::milliseconds>("server_timeout", default_server_timeout_);
+      blackboard->template set<std::chrono::milliseconds>("cancel_timeout", default_cancel_timeout_);
+      blackboard->template set<std::chrono::milliseconds>("bt_loop_duration", bt_loop_duration_);
+      blackboard->template set<std::chrono::milliseconds>(
         "wait_for_service_timeout",
         wait_for_service_timeout_);
     }
@@ -446,9 +446,9 @@ void BtActionServer<ActionT>::cleanErrorCodes()
   std::string name;
   for (const auto & error_code_name_prefix : error_code_name_prefixes_) {
     name = error_code_name_prefix + "_error_code";
-    blackboard_->set<unsigned short>(name, 0);  //NOLINT
+    blackboard_->template set<unsigned short>(name, 0);  //NOLINT
     name = error_code_name_prefix + "_error_msg";
-    blackboard_->set<std::string>(name, "");
+    blackboard_->template set<std::string>(name, "");
   }
   resetInternalError();
 }
