@@ -161,7 +161,7 @@ protected:
       response = callService(main_client_, req);
     } else {
       auto node = node_.lock();
-      auto client = node->create_client<SrvT>(
+      auto client = node->template create_client<SrvT>(
         srv_name, rclcpp::SystemDefaultsQoS(), callback_group_);
       response = callService(client, req);
     }
